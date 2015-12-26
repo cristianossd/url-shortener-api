@@ -1,0 +1,28 @@
+{
+  "name": "url-shortener-api",
+  "version": "1.0.0",
+  "description": "A simple URL Shortener API",
+  "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cristianossd/url-shortener-api.git"
+  },
+  "keywords": [
+    "url-shortener",
+    "api",
+    "nodejs",
+    "express"
+  ],
+  "author": "Cristiano Santos <cristianossd@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cristianossd/url-shortener-api/issues"
+  },
+  "homepage": "https://github.com/cristianossd/url-shortener-api#readme",
+  "dependencies": {
+    "body-parser": "^1.14.2",
+    "express": "^4.13.3",
+    "mongoose": "^4.3.4",
+    "rand-token": "^0.2.1"
+  }
+}
