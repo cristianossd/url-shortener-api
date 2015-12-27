@@ -1,7 +1,7 @@
-var express = require('express');
-var app = express();
-var bodyParser = require('body-parser');
-var randToken = require('rand-token');
+var express = require('express'),
+    app = express(),
+    bodyParser = require('body-parser'),
+    randToken = require('rand-token');
 
 // connecting database
 var mongoose = require('mongoose');
@@ -21,7 +21,9 @@ var router = express.Router();
 
 // requests middleware
 router.use(function(req, res, next) {
-  console.log('Something is happening.');
+  now = new Date(Date.now());
+  date = now.toString();
+  console.log("Request " + req.method + " to '" + req.url + "' at " + date);
   next();
 });
 
@@ -30,15 +32,48 @@ router.route('/api/urls')
     var url = new Url();
     url.token = randToken.generate(6);
     url.reference = req.body.url;
-    url.count = 0
+    url.visits = 0
 
     url.save(function(err) {
-      if (err)
-        res.send(err);
+      if (err) res.send(err);
 
       full_url = req.headers.host + '/u/' + url.token;
-      res.json({ shortened_url: full_url });
+      res.json({ url: { shortened: full_url, original: url.reference } });
     });
+  });
+
+router.route('/api/urls/:token')
+  .get(function(req, res) {
+    Url.findOne(
+      { 'token': req.params.token },
+      'token reference visits',
+      function(err, url) {
+        if (err) res.send(err);
+
+        res.json({
+          url: {
+            shortened: req.headers.host + '/u/' + url.token,
+            original: url.reference,
+            visits: url.visits
+          }
+        });
+      }
+    );
+  });
+
+router.route('/u/:token')
+  .get(function(req, res) {
+    token = req.params.token;
+
+    Url.findOneAndUpdate(
+      { token: token },
+      { $inc: { visits: 1 } },
+      function(err, url) {
+        if (err) res.send(err);
+
+        res.redirect(url.reference);
+      }
+    );
   });
 
 router.get('/', function(req, res) {
@@ -49,4 +84,4 @@ router.get('/', function(req, res) {
 app.use('/', router);
 
 app.listen(port);
-console.log('Magic happens on port ' + port);
+console.log('Server running on port ' + port);
